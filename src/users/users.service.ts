@@ -5,14 +5,20 @@ import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly usersFilePath = path.join(process.cwd(), 'data', 'users.json');
+  private readonly usersFilePath = path.join(process.cwd(), 'src', 'users.json');
 
   async getAllUsers(): Promise<UserDto[]> {
     try {
       const data = await fs.readFile(this.usersFilePath, 'utf-8');
       return JSON.parse(data);
     } catch (error) {
-      throw new NotFoundException('User data not found');
+      if (error instanceof SyntaxError) {
+        throw new Error('Error reading users file: Invalid JSON');
+      }
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+        throw new NotFoundException('Users file not found');
+      }
+      throw error; 
     }
   }
 
