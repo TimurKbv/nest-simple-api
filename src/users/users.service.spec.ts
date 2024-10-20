@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { NotFoundException } from '@nestjs/common';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs/promises';
 
 jest.mock('fs/promises');
@@ -67,6 +67,12 @@ describe('UsersService', () => {
       (fs.readFile as jest.Mock).mockResolvedValue(JSON.stringify(mockUsers));
 
       await expect(service.getUserById(2)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw InternalServerErrorException when an unexpected error occurs', async () => {
+      (fs.readFile as jest.Mock).mockRejectedValue(new Error('Unexpected error'));
+
+      await expect(service.getUserById(1)).rejects.toThrow(InternalServerErrorException);
     });
   });
 });

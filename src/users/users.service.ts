@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { UserDto } from './dto/user.dto';
@@ -23,11 +23,18 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<UserDto> {
-    const users = await this.getAllUsers();
-    const user = users.find((u) => u.id === id);
-    if (!user) {
-      throw new NotFoundException(` User with id ${id} not found`);
+    try {
+      const users = await this.getAllUsers();
+      const user = users.find((u) => u.id === id);
+      if (!user) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('An error occurred while fetching the user');
     }
-    return user;
   }
 }
