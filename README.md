@@ -44,7 +44,7 @@ npm run test:cov
 - `src/users/users.service.ts`: Service for handling user data
 - `src/users/users.controller.ts`: Controller for user endpoints
 - `src/users/users.module.ts`: Module for Users feature
-- `data/users.json`: JSON file containing user data
+- `src/users.json`: JSON file containing user data
 
 ## Running Tests
 
